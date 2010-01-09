@@ -9,7 +9,6 @@ module Localizer
     def localize_path controller, action_name
       self.with_options  :controller => controller, :action => action_name do |site|
         site.with_options :requirements => {:locale => /\w\w/} do |site_with_locale|
-          puts action_name
           site_with_locale.connect           ":locale" if action_name.to_s == 'index'
           site_with_locale.connect           ":locale/#{action_name}"
           site_with_locale.connect           ":locale/#{action_name}.htm"
@@ -36,9 +35,11 @@ module Localizer
       end
     end
     
-    def localized_resource resource_name
-      resources resource_name, :path_prefix => ':locale', 
-                    :requirements => {:locale => Localizer.config.locales} do |resource|
+    def localized_resource resource_name, options = {}
+      options.merge! :path_prefix => ':locale', 
+                     :requirements => {:locale => Localizer.config.locales}
+      
+      resources resource_name, options do |resource|
         yield resource if block_given?
       end
     end
